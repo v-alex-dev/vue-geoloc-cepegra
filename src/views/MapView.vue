@@ -28,7 +28,24 @@
     </div>
     <div class="btn-group flex-responsive gap-responsive mt-6">
       <button class="btn-glass" @click="updateMyPosition">Rafraîchir ma position</button>
+      <button class="btn-glass" @click="updateMyPositionHighAccuracy">
+        Position haute précision
+      </button>
       <button class="btn-glass" @click="refreshUsers">Rafraîchir utilisateurs</button>
+    </div>
+
+    <div v-if="positionInfo" class="position-info mt-4">
+      <h4 class="neon-text">Informations de position :</h4>
+      <div class="position-details">
+        <p><strong>Précision :</strong> {{ Math.round(positionInfo.accuracy) }}m</p>
+        <p v-if="positionInfo.altitude">
+          <strong>Altitude :</strong> {{ Math.round(positionInfo.altitude) }}m
+        </p>
+        <p v-if="positionInfo.speed">
+          <strong>Vitesse :</strong> {{ Math.round(positionInfo.speed * 3.6) }}km/h
+        </p>
+        <p><strong>Dernière mise à jour :</strong> {{ formatTimestamp(positionInfo.timestamp) }}</p>
+      </div>
     </div>
 
     <div class="user-table-container mt-8">
@@ -75,18 +92,26 @@ const { toastMsg, showToast, showSuccessToast, showErrorToast } = useToast()
 const myPosition = ref(null)
 const mapCenter = ref(null)
 const isError = ref(false)
+const positionInfo = ref(null)
 let intervalId = null
 
 // Computed pour les utilisateurs avec coordonnées valides
 const users = computed(() => userStore.users.filter((u) => u.lat && u.long))
+
+// Fonction pour formater le timestamp
+function formatTimestamp(timestamp) {
+  return new Date(timestamp).toLocaleTimeString('fr-FR')
+}
 
 async function initializeMap() {
   try {
     const position = await userStore.getCurrentPosition()
     myPosition.value = [position.lat, position.long]
     mapCenter.value = myPosition.value
+    positionInfo.value = position
   } catch {
     myPosition.value = null
+    positionInfo.value = null
     // Position par défaut (ex: Paris)
     mapCenter.value = MAP_CONFIG.DEFAULT_CENTER
   }
@@ -103,13 +128,38 @@ async function updateMyPosition() {
     const position = await userStore.getCurrentPosition()
     myPosition.value = [position.lat, position.long]
     mapCenter.value = myPosition.value
+    positionInfo.value = position
 
     await userStore.updateUserPosition(position)
-    showSuccessToast('Position mise à jour avec succès')
+    showSuccessToast(`Position mise à jour (précision: ${Math.round(position.accuracy)}m)`)
     refreshUsers()
     isError.value = false
   } catch (error) {
     showErrorToast('Erreur lors de la mise à jour: ' + error.message)
+    isError.value = true
+  }
+}
+
+async function updateMyPositionHighAccuracy() {
+  if (!userStore.userId) {
+    showErrorToast('Vous devez être connecté pour mettre à jour votre position')
+    isError.value = true
+    return
+  }
+
+  try {
+    showSuccessToast('Recherche de position haute précision...')
+    const position = await userStore.getAccuratePosition(3, 20) // 3 tentatives, précision min 20m
+    myPosition.value = [position.lat, position.long]
+    mapCenter.value = myPosition.value
+    positionInfo.value = position
+
+    await userStore.updateUserPosition(position)
+    showSuccessToast(`Position haute précision obtenue (${Math.round(position.accuracy)}m)`)
+    refreshUsers()
+    isError.value = false
+  } catch (error) {
+    showErrorToast('Erreur lors de la mise à jour haute précision: ' + error.message)
     isError.value = true
   }
 }
@@ -297,10 +347,53 @@ onUnmounted(() => {
   font-size: 0.75rem;
 }
 
+.position-info {
+  background: rgba(0, 255, 231, 0.1);
+  border: 1px solid rgba(0, 255, 231, 0.3);
+  border-radius: 1rem;
+  padding: 1rem;
+  margin-top: 1rem;
+}
+
+.position-info h4 {
+  margin: 0 0 0.5rem 0;
+  font-size: 1rem;
+}
+
+.position-details {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 0.5rem;
+}
+
+.position-details p {
+  margin: 0;
+  padding: 0.25rem 0;
+  color: #00ffe7;
+  font-size: 0.9rem;
+}
+
+.position-details strong {
+  color: #fff;
+}
+
 @media (max-width: 640px) {
   .btn-danger {
     padding: 0.25rem 0.5rem;
     font-size: 0.7rem;
+  }
+
+  .position-info {
+    padding: 0.75rem;
+  }
+
+  .position-details {
+    grid-template-columns: 1fr;
+    gap: 0.25rem;
+  }
+
+  .position-details p {
+    font-size: 0.8rem;
   }
 }
 

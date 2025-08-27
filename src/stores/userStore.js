@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia'
 import { API_CONFIG } from '../config/constants'
+import { useGeolocation } from '../composables/useGeolocation'
 
 export const useUserStore = defineStore('user', {
   state: () => ({
@@ -89,15 +90,22 @@ export const useUserStore = defineStore('user', {
       }
     },
 
-    async getCurrentPosition() {
-      return new Promise((resolve, reject) => {
-        navigator.geolocation.getCurrentPosition((position) => {
-          resolve({
-            lat: position.coords.latitude,
-            long: position.coords.longitude,
-          })
-        }, reject)
-      })
+    // Méthode pour obtenir la position actuelle avec haute précision
+    async getCurrentPosition(useHighAccuracy = true) {
+      const { getCurrentPosition } = useGeolocation()
+      return await getCurrentPosition(useHighAccuracy)
+    },
+
+    // Méthode pour obtenir une position très précise avec plusieurs tentatives
+    async getAccuratePosition(maxAttempts = 3, minAccuracy = 50) {
+      const { getAccuratePosition } = useGeolocation()
+      return await getAccuratePosition(maxAttempts, minAccuracy)
+    },
+
+    // Méthode pour surveiller la position en continu
+    watchUserPosition(callback, useHighAccuracy = true) {
+      const { watchPosition } = useGeolocation()
+      return watchPosition(callback, useHighAccuracy)
     },
   },
 })

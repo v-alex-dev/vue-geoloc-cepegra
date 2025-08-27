@@ -15,5 +15,24 @@ export const MAP_CONFIG = {
   ATTRIBUTION: '&copy; OpenStreetMap contributors',
 }
 
+// Configuration de la géolocalisation
+export const GEOLOCATION_CONFIG = {
+  HIGH_ACCURACY: {
+    enableHighAccuracy: true,
+    timeout: 15000, // 15 secondes
+    maximumAge: 30000, // Cache 30 secondes
+  },
+  NORMAL_ACCURACY: {
+    enableHighAccuracy: false,
+    timeout: 10000, // 10 secondes
+    maximumAge: 60000, // Cache 1 minute
+  },
+  WATCH_OPTIONS: {
+    enableHighAccuracy: true,
+    timeout: 20000, // 20 secondes pour le suivi
+    maximumAge: 10000, // Cache 10 secondes pour le suivi
+  },
+}
+
 // Intervalle de rafraîchissement automatique (en ms)
 export const REFRESH_INTERVAL = 10000
