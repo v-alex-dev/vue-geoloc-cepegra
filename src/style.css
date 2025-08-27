@@ -1,0 +1,335 @@
+@import 'tailwindcss';
+/*
+============================================================
+  style.css — Global "Glasstransform Dark" theme for PWA Geolocation
+============================================================
+
+This file defines:
+- CSS variables for color, subtle orange neon, background, glassmorphism, etc.
+- Generic utility classes to use in the app (e.g.: .glass, .neon-text, .btn-glass, etc.)
+- Animations should be done in vanilla CSS (not via Tailwind)
+
+IMPORTANT:
+- To create utility classes, use @apply to add Tailwind classes.
+- Classes created here MUST NOT be reused in other @apply declarations.
+- This file serves as a global style base and example for the team.
+
+Theme:
+- Main background: bg-gray-800
+- Glassmorphism effect (blur, transparency)
+- Subtle orange neon accent
+- Dark, modern, readable style
+*/
+
+:root {
+  /* Main colors */
+  --color-bg: #1f2937; /* gray-800 */
+  --color-glass: rgba(31, 41, 55, 0.6); /* semi-transparent dark gray */
+  --color-glass-blur: 16px;
+  --color-neon: #ff9100; /* subtle neon orange */
+  --color-neon-glow: 0 0 8px #ff910088, 0 0 2px #ff9100cc;
+  --color-text: #f3f4f6; /* gray-100 */
+  --color-border: #ff910055;
+}
+
+body {
+  background: var(--color-bg);
+  color: var(--color-text);
+  font-family: 'Inter', 'Roboto', Arial, sans-serif;
+}
+
+/*
+============================
+  UTILITY CLASSES
+============================
+*/
+
+/* Card/Block glassmorphism effect */
+.glass {
+  @apply rounded-xl shadow-lg p-4;
+  background: var(--color-glass);
+  backdrop-filter: blur(var(--color-glass-blur));
+  border: 1px solid var(--color-border);
+}
+
+/* Subtle orange neon text */
+.neon-text {
+  color: var(--color-neon);
+  text-shadow: var(--color-neon-glow);
+}
+
+/* Main button glass + neon style */
+.btn-glass {
+  @apply px-4 py-2 rounded-lg font-semibold transition;
+  background: var(--color-glass);
+  color: var(--color-neon);
+  border: 1px solid var(--color-neon);
+  box-shadow: 0 2px 8px #ff910022;
+  text-shadow: var(--color-neon-glow);
+}
+.btn-glass:hover {
+  background: rgba(31, 41, 55, 0.8);
+  box-shadow: 0 0 16px #ff910088;
+}
+
+/* Input glass style */
+.input-glass {
+  @apply px-3 py-2 rounded-md outline-none;
+  background: var(--color-glass);
+  color: var(--color-text);
+  border: 1px solid var(--color-border);
+  transition: border 0.2s;
+}
+.input-glass:focus {
+  border: 1.5px solid var(--color-neon);
+  box-shadow: 0 0 8px #ff910044;
+}
+
+/*
+============================
+  VANILLA CSS ANIMATIONS
+============================
+*/
+
+@keyframes neon-flicker {
+  0%,
+  100% {
+    text-shadow: var(--color-neon-glow);
+  }
+  45% {
+    text-shadow: none;
+  }
+  50% {
+    text-shadow: 0 0 2px #ff9100cc;
+  }
+  55% {
+    text-shadow: none;
+  }
+}
+
+.neon-flicker {
+  animation: neon-flicker 2.5s infinite alternate;
+}
+
+/* Fade-in animation example */
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+.fade-in {
+  animation: fade-in 0.8s ease;
+}
+
+/*
+============================
+  RESPONSIVE DESIGN
+============================
+*/
+
+/* Mobile-first responsive breakpoints */
+@media (max-width: 640px) {
+  /* Mobile styles */
+  .glass {
+    padding: 0.75rem;
+    margin: 0.5rem;
+  }
+
+  .btn-glass {
+    padding: 0.5rem 0.75rem;
+    font-size: 0.875rem;
+    width: 100%;
+    display: block;
+  }
+
+  .input-glass {
+    font-size: 0.875rem;
+  }
+
+  /* Navigation responsive */
+  .main-nav-mobile {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    padding: 0.5rem;
+  }
+
+  /* Map responsive */
+  .map-responsive {
+    height: 250px !important;
+  }
+
+  /* Table responsive */
+  .table-responsive {
+    font-size: 0.75rem;
+    overflow-x: auto;
+  }
+
+  .table-responsive table {
+    min-width: 100%;
+  }
+
+  .table-responsive th,
+  .table-responsive td {
+    padding: 0.25rem 0.5rem;
+  }
+
+  /* Container responsive */
+  .container-responsive {
+    max-width: 100%;
+    margin: 0 0.5rem;
+    padding: 0 0.5rem;
+  }
+
+  /* Button group responsive */
+  .btn-group-mobile {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  /* Toast responsive */
+  .toast-mobile {
+    left: 0.5rem;
+    right: 0.5rem;
+    top: 0.5rem;
+    width: auto;
+  }
+}
+
+@media (min-width: 641px) and (max-width: 768px) {
+  /* Tablet styles */
+  .glass {
+    padding: 1rem;
+    margin: 0 1rem;
+  }
+
+  .container-responsive {
+    max-width: 42rem;
+    margin: 0 auto;
+    padding: 0 1rem;
+  }
+
+  .map-responsive {
+    height: 300px !important;
+  }
+
+  .btn-group-tablet {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .btn-group-tablet .btn-glass {
+    flex: 1;
+    min-width: 8rem;
+  }
+}
+
+@media (min-width: 769px) and (max-width: 1024px) {
+  /* Small desktop styles */
+  .container-responsive {
+    max-width: 56rem;
+    margin: 0 auto;
+    padding: 0 1.5rem;
+  }
+
+  .map-responsive {
+    height: 350px !important;
+  }
+}
+
+@media (min-width: 1025px) {
+  /* Large desktop styles */
+  .container-responsive {
+    max-width: 72rem;
+    margin: 0 auto;
+    padding: 0 2rem;
+  }
+
+  .map-responsive {
+    height: 400px !important;
+  }
+}
+
+/* Utility classes for responsive text */
+.text-responsive {
+  font-size: 0.875rem;
+}
+
+@media (min-width: 640px) {
+  .text-responsive {
+    font-size: 1rem;
+  }
+}
+
+@media (min-width: 768px) {
+  .text-responsive {
+    font-size: 1.125rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .text-responsive {
+    font-size: 1.25rem;
+  }
+}
+
+.title-responsive {
+  font-size: 1.125rem;
+}
+
+@media (min-width: 640px) {
+  .title-responsive {
+    font-size: 1.25rem;
+  }
+}
+
+@media (min-width: 768px) {
+  .title-responsive {
+    font-size: 1.5rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .title-responsive {
+    font-size: 1.875rem;
+  }
+}
+
+/* Responsive flex utilities */
+.flex-responsive {
+  display: flex;
+  flex-direction: column;
+}
+
+@media (min-width: 640px) {
+  .flex-responsive {
+    flex-direction: row;
+  }
+}
+
+.gap-responsive {
+  gap: 0.5rem;
+}
+
+@media (min-width: 640px) {
+  .gap-responsive {
+    gap: 1rem;
+  }
+}
+
+@media (min-width: 768px) {
+  .gap-responsive {
+    gap: 1.5rem;
+  }
+}
+
+/*
+============================
+  END OF GLOBAL STYLE
+============================
+*/
